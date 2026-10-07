@@ -10,7 +10,7 @@ const ACTIVE_NETWORK = "sepolia";
 const CONTRACT_ADDRESS = "0x899710E861F8F7fCAae2fa5047DB3497309aACb2";
 
 // 3. Your backend: localhost while building, your Render URL once deployed
-const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = "https://ai-property-valuation.onrender.com";
 
 // 4. The contract's functions and events, in ethers "human-readable" form.
 //    If you change the contract, update this list AND backend/abi.json.

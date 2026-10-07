@@ -120,17 +120,81 @@ async function storeFromWallet() {
 }
 
 /** Step 3a: ask the backend's AI for a decision. */
+
 async function askAI() {
   const el = $("ai-status");
-  const prompt = $("ai-prompt").value.trim();
-  if (!prompt) return setStatus(el, "failed", "Write a question for the AI first.");
-  setStatus(el, "pending", "Asking the AI…");
+
   try {
-    const data = await api("/ai/decide", { method: "POST", body: JSON.stringify({ prompt }) });
-    $("ai-decision").value = data.decision;
-    setStatus(el, "confirmed", data.demo
-      ? "Demo answer. Set API_KEY in backend/.env to use a real model."
-      : "The AI answered. Review it, then store it on-chain.");
+    const location = $("pf-location")?.value.trim() || "";
+    const city = location;
+    const locality = "";
+    const propertyType = $("pf-type")?.value.trim() || "";
+    const area = Number($("pf-area")?.value || 0);
+    const bedrooms = Number($("pf-beds")?.value || 0);
+    const age = Number($("pf-age")?.value || 0);
+
+    if (!city) {
+      return setStatus(el, "failed", "Enter the city first.");
+    }
+
+    if (!propertyType) {
+      return setStatus(el, "failed", "Choose a property type.");
+    }
+
+    if (!area || area <= 0) {
+      return setStatus(el, "failed", "Enter a valid property area.");
+    }
+
+    setStatus(
+      el,
+      "pending",
+      "Analyzing historical comparable sales…"
+    );
+
+    const data = await api("/valuation/ai", {
+      method: "POST",
+      body: JSON.stringify({
+        city,
+        locality,
+        property_type: propertyType,
+        area_sqft: area,
+        bedrooms,
+        property_age_years: age
+      })
+    });
+
+    // Keep the original AI decision box working.
+    const decision = $("ai-decision");
+
+    const summary = [
+      "PROPCHAIN AI PROPERTY VALUATION",
+      `City: ${city}`,
+      `Locality: ${locality || "Not specified"}`,
+      `Property type: ${propertyType}`,
+      `Area: ${area} sq ft`,
+      `Estimated value: ${data.estimated_value ?? "Not returned"}`,
+      `Confidence: ${data.confidence ?? "Not returned"}`,
+      `Comparables used: ${data.comparable_properties_used ?? "Not returned"}`,
+      `Explanation: ${data.explanation ?? "Not returned"}`
+    ].join("\n");
+
+    if (decision) {
+      if ("value" in decision) {
+        decision.value = summary;
+      } else {
+        decision.textContent = summary;
+      }
+    }
+
+    // Keep the valuation available for the existing Store button.
+    window.currentValuationRecordText = summary;
+
+    setStatus(
+      el,
+      "confirmed",
+      "Valuation received. Review the result before storing it on-chain."
+    );
+
   } catch (err) {
     setStatus(el, "failed", err.message);
   }

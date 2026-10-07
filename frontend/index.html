@@ -1,77 +1,300 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>INNOBLOCK 2.0 Starter dApp</title>
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PropChain AI – AI Property Valuation • Blockchain Verified</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div>
-      <h1>Proof Registry</h1>
-      <p class="sub">INNOBLOCK 2.0 starter: store a fingerprint of any text on-chain, then prove it was never changed.</p>
-    </div>
-    <span id="network-badge" class="badge"></span>
-  </header>
 
-  <div id="setup-warning" class="banner hidden"></div>
-
-  <main>
-    <!-- 1. Wallet -->
-    <section class="card">
-      <h2><span class="step">1</span> Connect your wallet</h2>
-      <p class="hint">MetaMask (or any browser wallet) on the network shown above.</p>
-      <button id="connect-btn">Connect wallet</button>
-      <dl class="facts">
-        <dt>Address</dt><dd id="wallet-address">Not connected</dd>
-        <dt>Balance</dt><dd id="wallet-balance">-</dd>
-      </dl>
-      <div id="connect-status" class="status"></div>
-    </section>
-
-    <!-- 2. User signs -->
-    <section class="card">
-      <h2><span class="step">2</span> Store from your wallet</h2>
-      <p class="hint">You sign the transaction in MetaMask and pay the (test) gas.</p>
-      <textarea id="wallet-text" rows="3" placeholder="Type anything: a certificate, a vote, a land record..."></textarea>
-      <button id="wallet-store-btn">Store fingerprint on-chain</button>
-      <div id="wallet-status" class="status"></div>
-    </section>
-
-    <!-- 3. Backend signs -->
-    <section class="card">
-      <h2><span class="step">3</span> AI decision, recorded on-chain</h2>
-      <p class="hint">The backend asks an AI model, then signs with its own wallet. No API key? It returns a demo answer.</p>
-      <textarea id="ai-prompt" rows="2" placeholder="e.g. Should loan application #12 be approved? Income 40k, debt 5k."></textarea>
-      <button id="ai-ask-btn">Ask the AI</button>
-      <textarea id="ai-decision" rows="3" placeholder="The AI's decision appears here. You can edit it before storing."></textarea>
-      <button id="ai-store-btn">Store decision on-chain</button>
-      <div id="ai-status" class="status"></div>
-    </section>
-
-    <!-- 4. Verify -->
-    <section class="card wide">
-      <h2><span class="step">4</span> Records and verification</h2>
-      <p class="hint">Records saved by the backend. Edit any text and press Verify: one changed character and it fails.</p>
-      <button id="refresh-btn" class="secondary">Refresh records</button>
-      <div id="records"></div>
-      <h3>Check any record by id</h3>
-      <p class="hint">Works for records stored from a wallet in step 2 too: enter the id and the exact text.</p>
-      <div class="record">
-        <input id="check-id" class="rid-input" type="number" min="1" placeholder="id">
-        <input id="check-text" placeholder="Exact text that was stored">
-        <button id="check-btn" class="secondary">Verify</button>
-        <span id="check-result" class="result"></span>
+<header class="nav">
+  <div class="wrap nav-in">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
       </div>
-    </section>
-  </main>
+      <div>
+        <b>PropChain AI</b>
+        <small>AI Property Valuation • Blockchain Verified</small>
+      </div>
+    </div>
+    <span id="network-badge" class="badge"><i aria-hidden="true"></i>Ethereum Sepolia</span>
+    <div class="wallet-bar" aria-label="Wallet connection">
+      <div class="wallet-info">
+        <div id="connect-status">Not connected</div>
+        <div>Address: <span id="wallet-address">-</span></div>
+        <div>Balance: <span id="wallet-balance">-</span></div>
+      </div>
+      <button id="connect-btn" class="btn-primary" type="button">Connect Wallet</button>
+    </div>
+  </div>
+</header>
 
-  <footer>Built from the INNOBLOCK 2.0 starter · GCET Blockchain Club</footer>
+<div id="setup-warning" class="setup-warning" role="alert"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.17.0/dist/ethers.umd.min.js"></script>
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div>
+      <h1 id="hero-title">AI-Powered Property Valuation</h1>
+      <p class="lead">Estimate property value using historical market data and create a tamper-evident valuation record on Ethereum.</p>
+      <div class="hero-cta">
+        <a class="btn-primary" href="#property">Value a property</a>
+        <a class="btn-ghost" href="#verify">Verify a record</a>
+      </div>
+    </div>
+    <div class="ledger" aria-hidden="true">
+      <div class="skyline">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <h2>Sample valuation record</h2>
+      <div class="val">₹1.24 Cr</div>
+      <div class="ledger-row"><span>Comparable sales used</span><span>4</span></div>
+      <div class="ledger-row"><span>Confidence</span><span>87%</span></div>
+      <div class="ledger-row"><span>Anchored on</span><span>Ethereum Sepolia</span></div>
+      <small>Illustration only. Demo values.</small>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+
+  <!-- Property details -->
+  <section class="block" id="property" aria-labelledby="property-title">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <h2 id="property-title">Property Details</h2>
+          <p>Fill in the details below. They are turned into the question sent to the AI in the valuation section.</p>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="wide">
+          <label for="pf-location">Location</label>
+          <input id="pf-location" type="text" placeholder="e.g. Gachibowli, Hyderabad" autocomplete="off">
+        </div>
+        <div class="wide">
+          <label for="pf-type">Property type</label>
+          <select id="pf-type">
+            <option>Apartment</option><option>Independent house</option><option>Villa</option><option>Plot</option><option>Commercial space</option>
+          </select>
+        </div>
+        <div>
+          <label for="pf-area">Area (sq ft)</label>
+          <input id="pf-area" type="number" min="0" placeholder="1400">
+        </div>
+        <div>
+          <label for="pf-beds">Bedrooms</label>
+          <input id="pf-beds" type="number" min="0" placeholder="3">
+        </div>
+        <div>
+          <label for="pf-baths">Bathrooms</label>
+          <input id="pf-baths" type="number" min="0" placeholder="2">
+        </div>
+        <div>
+          <label for="pf-age">Property age (years)</label>
+          <input id="pf-age" type="number" min="0" placeholder="5">
+        </div>
+        <div>
+          <label for="pf-floor">Floor</label>
+          <input id="pf-floor" type="text" placeholder="7 of 14">
+        </div>
+        <div>
+          <label for="pf-parking">Parking</label>
+          <select id="pf-parking">
+            <option>1 covered car park</option><option>2 covered car parks</option><option>Open parking only</option><option>No parking</option>
+          </select>
+        </div>
+      </div>
+      <p class="hint">Editing these fields updates the question in the AI section automatically. You can still edit that question by hand.</p>
+    </div>
+  </section>
+
+  <!-- Comparable sales -->
+  <section class="block" aria-labelledby="comps-title">
+    <div class="sec-head">
+      <div>
+        <h2 id="comps-title">Historical Comparable Sales</h2>
+        <p>Recent sales of similar properties that anchor the estimate.</p>
+      </div>
+      <span class="tag demo">Demo / sample data</span>
+    </div>
+    <div class="comps">
+      <article class="card comp">
+        <h3>Gachibowli, Hyderabad</h3>
+        <div class="price">₹1.38 Cr</div>
+        <dl><dt>Area</dt><dd>1,450 sq ft</dd><dt>Bedrooms</dt><dd>3</dd><dt>Age</dt><dd>6 years</dd></dl>
+      </article>
+      <article class="card comp">
+        <h3>Kondapur, Hyderabad</h3>
+        <div class="price">₹1.12 Cr</div>
+        <dl><dt>Area</dt><dd>1,320 sq ft</dd><dt>Bedrooms</dt><dd>3</dd><dt>Age</dt><dd>4 years</dd></dl>
+      </article>
+      <article class="card comp">
+        <h3>Madhapur, Hyderabad</h3>
+        <div class="price">₹96 L</div>
+        <dl><dt>Area</dt><dd>1,180 sq ft</dd><dt>Bedrooms</dt><dd>2</dd><dt>Age</dt><dd>8 years</dd></dl>
+      </article>
+      <article class="card comp">
+        <h3>Kukatpally, Hyderabad</h3>
+        <div class="price">₹1.05 Cr</div>
+        <dl><dt>Area</dt><dd>1,500 sq ft</dd><dt>Bedrooms</dt><dd>3</dd><dt>Age</dt><dd>10 years</dd></dl>
+      </article>
+    </div>
+  </section>
+
+  <!-- AI valuation -->
+  <section class="block" aria-labelledby="ai-title">
+    <div class="card ai">
+      <div class="sec-head">
+        <div>
+          <h2 id="ai-title">AI Valuation Result</h2>
+          <p>Ask the AI to value the property above, then store its decision on-chain.</p>
+        </div>
+        <span class="tag demo">Demo values shown</span>
+      </div>
+
+      <div class="ai-top">
+        <div class="metric"><small>Estimated Property Value</small><b>₹1.24 Cr</b></div>
+        <div class="metric"><small>Confidence Score</small><b class="sm">87%</b><div class="bar" role="img" aria-label="Confidence 87 percent"><i></i></div></div>
+        <div class="metric"><small>Comparable Properties Used</small><b class="sm">4</b></div>
+      </div>
+      <p class="explain">The estimate sits between the Kondapur and Gachibowli sales, adjusted for area, age and floor. It is a demo explanation until live valuation is connected.</p>
+
+      <label for="ai-prompt" class="label-spaced">Question for the AI</label>
+      <textarea id="ai-prompt" rows="3" placeholder="Estimate the value of a 3 bedroom apartment in Gachibowli, Hyderabad."></textarea>
+      <div class="actions">
+        <button id="ai-ask-btn" class="btn-primary" type="button">Ask AI</button>
+        <button id="ai-store-btn" class="btn-ghost" type="button">Store Decision</button>
+      </div>
+
+      <p class="out-label">Status</p>
+      <div id="ai-status" class="out compact" role="status" aria-live="polite">Ready</div>
+      <p class="out-label">AI decision</p>
+      <div id="ai-decision" class="out" aria-live="polite">The AI answer will appear here.</div>
+    </div>
+  </section>
+
+  <!-- Blockchain provenance -->
+  <section class="block" aria-labelledby="chain-title">
+    <div class="card chain">
+      <div class="sec-head">
+        <div>
+          <h2 id="chain-title">Blockchain Provenance</h2>
+          <p>A stored valuation can be checked later by anyone. Any change to the text produces a different fingerprint.</p>
+        </div>
+        <span class="tag idle">Placeholder until a record is stored</span>
+      </div>
+      <dl class="kv">
+        <div><dt>Network</dt><dd>Ethereum Sepolia</dd></div>
+        <div><dt>Record status</dt><dd>Not stored yet</dd></div>
+        <div><dt>Record ID</dt><dd>Assigned when stored</dd></div>
+        <div><dt>Transaction hash</dt><dd>Shown after the transaction confirms</dd></div>
+        <div><dt>Verification</dt><dd>Pending</dd></div>
+        <div><dt>Explorer link</dt><dd>Available after the first transaction</dd></div>
+      </dl>
+
+      <div class="chain-row">
+        <div class="panel">
+          <h3 class="panel-title">Store a note from your wallet</h3>
+          <label for="wallet-text">Valuation note</label>
+          <textarea id="wallet-text" rows="3" placeholder="e.g. 3 BHK, Gachibowli, 1,450 sq ft: estimated ₹1.24 Cr"></textarea>
+          <div class="actions">
+            <button id="wallet-store-btn" class="btn-chain" type="button">Store from wallet</button>
+          </div>
+          <div id="wallet-status" class="out compact" role="status" aria-live="polite">Wallet status will appear here.</div>
+        </div>
+        <div class="panel">
+          <h3 class="panel-title">Stored valuation records</h3>
+          <p class="hint flush">Entries are read from the contract on Sepolia.</p>
+          <button id="refresh-btn" class="btn-chain" type="button">Refresh records</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Records / audit trail -->
+  <section class="block" aria-labelledby="records-title">
+    <div class="sec-head">
+      <div>
+        <h2 id="records-title">Audit Trail</h2>
+        <p>Each stored valuation appears here as an entry in the on-chain audit trail.</p>
+      </div>
+    </div>
+    <div id="records" aria-live="polite"></div>
+  </section>
+
+  <!-- Verify -->
+  <section class="block" id="verify" aria-labelledby="verify-title">
+    <div class="card verify-card">
+      <div class="sec-head">
+        <div>
+          <h2 id="verify-title">Verify Valuation Record</h2>
+          <p>Enter a record ID and the exact valuation text. If they match what was stored on-chain, the record is verified.</p>
+        </div>
+        <span class="badge">On-chain check</span>
+      </div>
+      <div class="verify-grid">
+        <div>
+          <label for="check-id">Record ID</label>
+          <input id="check-id" type="number" min="0" placeholder="0">
+        </div>
+        <div>
+          <label for="check-text">Valuation text</label>
+          <textarea id="check-text" rows="3" placeholder="Paste the exact valuation text you want to verify"></textarea>
+        </div>
+        <div class="full actions flush-top">
+          <button id="check-btn" class="btn-primary" type="button">Verify record</button>
+        </div>
+        <div class="full">
+          <div id="check-result" class="out" role="status" aria-live="polite">The verification result will appear here.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">PropChain AI runs on Ethereum Sepolia, a test network. Valuations and comparable sales shown on this page are demo data and not financial advice.</div>
+</footer>
+
+<!-- Fills the existing #ai-prompt from the property form. Does not touch any app.js logic. -->
+<script>
+(function () {
+  var ids = ['pf-location','pf-type','pf-area','pf-beds','pf-baths','pf-age','pf-floor','pf-parking'];
+  var prompt = document.getElementById('ai-prompt');
+  var edited = false;
+  function v(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function build() {
+    if (edited || !prompt) return;
+    var parts = [];
+    if (v('pf-area')) parts.push(v('pf-area') + ' sq ft');
+    if (v('pf-beds')) parts.push(v('pf-beds') + ' bedroom');
+    parts.push(v('pf-type').toLowerCase());
+    var s = 'Estimate the market value of a ' + parts.join(', ') + (v('pf-location') ? ' in ' + v('pf-location') : '') + '.';
+    var extra = [];
+    if (v('pf-baths')) extra.push(v('pf-baths') + ' bathrooms');
+    if (v('pf-age')) extra.push(v('pf-age') + ' years old');
+    if (v('pf-floor')) extra.push('floor ' + v('pf-floor'));
+    if (v('pf-parking')) extra.push(v('pf-parking').toLowerCase());
+    if (extra.length) s += ' Details: ' + extra.join(', ') + '.';
+    prompt.value = s;
+  }
+  ids.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) { el.addEventListener('input', build); el.addEventListener('change', build); }
+  });
+  if (prompt) prompt.addEventListener('input', function (e) { if (e.isTrusted) edited = true; });
+})();
+</script>
+
+<!-- Existing scripts: replace these three tags with the exact ones from your original index.html if they differ -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
