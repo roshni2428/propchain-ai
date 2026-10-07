@@ -5,3 +5,4 @@ python-dotenv==1.2.4
 requests==2.34.2
 psycopg[binary]==3.3.6
 gunicorn==26.2.0
+Flask-Cors
